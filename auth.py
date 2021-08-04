@@ -1,13 +1,13 @@
 import sys
+from db_manager import session_factory
+from models import User, UserSession
+
+class Auth:
+    @staticmethod
+    def login():
+        pass
 
 
-def create_user():
-    pass
-
-
-def login():
-    pass
-
-
-def logout():
-    pass
+    @staticmethod
+    def logout():
+        pass

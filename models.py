@@ -1,25 +1,23 @@
+import os
 import uuid
 import bcrypt
 import datetime
 
-from .db_manager import Base
-from sqlalchemy import Column, Integer, String, DateTime
-from sqlalchemy.orm import relashionship
+from db_manager import session_factory, Base
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
-
-from os import getpid
 
 
 class User(Base):
     __tablename__ = 'users'
 
-    id = Column('id', UUID(), default=uuid.uuid4(), primari_key=True, as_uuid=True, index=True)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     username = Column('username', String(32), unique=True, nullable=False)
     email = Column('email', String(64), nullable=False)
     password_hash = Column(String(220), nullable=False)
-    session = relashionship('UserSession', backref='session', )
-    account = relashionship('Account', back_populates='user')
-
+    sessions = relationship('UserSession', back_populates='user_id', cascade="all, delete")
+    account = relationship('Account', back_populates='user_id', cascade="all, delete")
 
     @property
     def password(self):
@@ -39,9 +37,8 @@ class UserSession(Base):
     id = Column('id', Integer, primary_key=True)
     terminal_pid = Column(String(6), default=os.getpid())
     begin = Column(DateTime, default=datetime.datetime.now())
-    end = Column(DateTime)
+    end = Column(DateTime, nullable=True)
     user_id = Column(Integer, ForeignKey('users.id'))
-
 
     # @property
     # def session(self):
@@ -53,7 +50,6 @@ class UserSession(Base):
     #
     # def verify_session(self):
 
-
     def __repr__(self):
         return '<{0}: Session Started at {1} {2}>'.format(self.user_id, self.begin, self.terminal_pid)
 
@@ -61,7 +57,7 @@ class UserSession(Base):
 class Account(Base):
     __tablename__ = 'accounts'
 
-    id = Column('id', UUID(), default=uuid.uuid4(), primari_key=True, as_uuid=True, index=True)
+    id = Column('id', UUID(as_uuid=True), default=uuid.uuid4, primary_key=True)
     site = Column(String(32), index=True)
     username = Column(String(64), index=True)
     password = Column(String(220), index=True)
