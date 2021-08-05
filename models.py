@@ -51,7 +51,7 @@ class UserSession(Base):
     # def verify_session(self):
 
     def __repr__(self):
-        return '<{0}: Session Started at {1} {2}>'.format(self.user_id, self.begin, self.terminal_pid)
+        return '<{0}: Session Started at {1} in the Terminal: {2}>'.format(self.user_id, self.begin, self.terminal_pid)
 
 
 class Account(Base):
